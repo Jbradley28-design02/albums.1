@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "albums.html",
+    "href": "albums.html",
+    "title": "Albums from MusicBrainz",
+    "section": "",
+    "text": "library(tidyverse)\nlibrary(httr2)\nlibrary(jsonlite)"
+  },
+  {
+    "objectID": "albums.html#download-albums",
+    "href": "albums.html#download-albums",
+    "title": "Albums from MusicBrainz",
+    "section": "Download Albums",
+    "text": "Download Albums\nWe fetch the release groups for Pink Floyd and Stone Temple Pilots via the MusicBrainz API, filtering for studio albums.\n\nfetch_albums &lt;- function(artist_id, artist_name) {\n  url &lt;- paste0(\n    \"https://musicbrainz.org/ws/2/release-group?artist=\",\n    artist_id,\n    \"&limit=100&fmt=json\"\n  )\n  \n  res &lt;- request(url) |&gt;\n    req_headers(\"User-Agent\" = \"CourseProject/1.0 (student@example.edu)\") |&gt;\n    req_retry(\n      max_tries = 5,\n      is_transient = \\(resp) resp_status(resp) %in% c(429, 503),\n      backoff = \\(i) i * 2\n    ) |&gt;\n    req_perform() |&gt;\n    resp_body_json()\n  \n  rgs &lt;- res[[\"release-groups\"]]\n  \n  tibble(\n    artist = artist_name,\n    title = map_chr(rgs, \"title\"),\n    primary_type = map_chr(rgs, \\(x) x[[\"primary-type\"]] %||% NA_character_),\n    secondary_types = map_chr(rgs, \\(x) paste(x[[\"secondary-types\"]], collapse = \", \")),\n    release_date = map_chr(rgs, \\(x) x[[\"first-release-date\"]] %||% NA_character_)\n  ) |&gt;\n    filter(primary_type == \"Album\", secondary_types == \"\") |&gt;\n    select(artist, title, release_date)\n}\n\n# MBIDs for Pink Floyd and Stone Temple Pilots\nartists &lt;- tribble(\n  ~artist, ~id,\n  \"Pink Floyd\", \"83d91898-7763-47d7-b03b-b92132375c47\",\n  \"Stone Temple Pilots\", \"8c32bb01-58a3-453b-8050-8c0620edb0e5\"\n)\n\nalbums &lt;- map2(artists$id, artists$artist, fetch_albums) |&gt;\n  list_rbind() |&gt;\n  arrange(artist, release_date)\n\nwrite_csv(albums, \"albums.csv\")\nalbums\n\n# A tibble: 21 × 3\n   artist     title                          release_date\n   &lt;chr&gt;      &lt;chr&gt;                          &lt;chr&gt;       \n 1 Pink Floyd The Piper at the Gates of Dawn 1967-07-07  \n 2 Pink Floyd A Saucerful of Secrets         1968-06-29  \n 3 Pink Floyd Ummagumma                      1969-10-25  \n 4 Pink Floyd Atom Heart Mother              1970-10-10  \n 5 Pink Floyd Meddle                         1971-10-30  \n 6 Pink Floyd The Dark Side of the Moon      1973-03-24  \n 7 Pink Floyd Wish You Were Here             1975-09-12  \n 8 Pink Floyd Animals                        1977-01-23  \n 9 Pink Floyd The Wall                       1979-11-30  \n10 Pink Floyd The Final Cut                  1983-03-21  \n# ℹ 11 more rows"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Albums of PF&STP",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  }
+]
