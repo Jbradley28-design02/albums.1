@@ -155,6 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#download-albums" id="toc-download-albums" class="nav-link active" data-scroll-target="#download-albums">Download Albums</a></li>
+  <li><a href="#album-covers" id="toc-album-covers" class="nav-link" data-scroll-target="#album-covers">Album Covers</a></li>
   </ul>
 </nav>
     </div>
@@ -190,63 +191,323 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We fetch the release groups for Pink Floyd and Stone Temple Pilots via the MusicBrainz API, filtering for studio albums.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fetch_albums <span class="ot">&lt;-</span> <span class="cf">function</span>(artist_id, artist_name) {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://musicbrainz.org/ws/2/release-group?artist="</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    artist_id,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"&amp;limit=100&amp;fmt=json"</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">request</span>(url) <span class="sc">|&gt;</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_headers</span>(<span class="st">"User-Agent"</span> <span class="ot">=</span> <span class="st">"CourseProject/1.0 (student@example.edu)"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_retry</span>(</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">max_tries =</span> <span class="dv">5</span>,</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">is_transient =</span> \(resp) <span class="fu">resp_status</span>(resp) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">429</span>, <span class="dv">503</span>),</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">backoff =</span> \(i) i <span class="sc">*</span> <span class="dv">2</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_perform</span>() <span class="sc">|&gt;</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">resp_body_json</span>()</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  rgs <span class="ot">&lt;-</span> res[[<span class="st">"release-groups"</span>]]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Sys.sleep</span>(<span class="fl">1.5</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://musicbrainz.org/ws/2/release-group?artist="</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    artist_id,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"&amp;limit=100&amp;fmt=json"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">request</span>(url) <span class="sc">|&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_headers</span>(<span class="st">"User-Agent"</span> <span class="ot">=</span> <span class="st">"CourseProject/1.0 (student@example.edu)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_throttle</span>(<span class="at">rate =</span> <span class="fl">0.5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_retry</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">max_tries =</span> <span class="dv">5</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">is_transient =</span> \(resp) <span class="fu">resp_status</span>(resp) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">429</span>, <span class="dv">503</span>),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">after =</span> \(resp) <span class="dv">3</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">req_perform</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">resp_body_json</span>()</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">artist =</span> artist_name,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">map_chr</span>(rgs, <span class="st">"title"</span>),</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">primary_type =</span> <span class="fu">map_chr</span>(rgs, \(x) x[[<span class="st">"primary-type"</span>]] <span class="sc">%||%</span> <span class="cn">NA_character_</span>),</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">secondary_types =</span> <span class="fu">map_chr</span>(rgs, \(x) <span class="fu">paste</span>(x[[<span class="st">"secondary-types"</span>]], <span class="at">collapse =</span> <span class="st">", "</span>)),</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> <span class="fu">map_chr</span>(rgs, \(x) x[[<span class="st">"first-release-date"</span>]] <span class="sc">%||%</span> <span class="cn">NA_character_</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(primary_type <span class="sc">==</span> <span class="st">"Album"</span>, secondary_types <span class="sc">==</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(artist, title, release_date)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># MBIDs for Pink Floyd and Stone Temple Pilots</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>artists <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>artist, <span class="sc">~</span>id,</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Pink Floyd"</span>, <span class="st">"83d91898-7763-47d7-b03b-b92132375c47"</span>,</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Stone Temple Pilots"</span>, <span class="st">"8c32bb01-58a3-453b-8050-8c0620edb0e5"</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>albums <span class="ot">&lt;-</span> <span class="fu">map2</span>(artists<span class="sc">$</span>id, artists<span class="sc">$</span>artist, fetch_albums) <span class="sc">|&gt;</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(artist, release_date)</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(albums, <span class="st">"albums.csv"</span>)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>albums</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 21 × 3
-   artist     title                          release_date
-   &lt;chr&gt;      &lt;chr&gt;                          &lt;chr&gt;       
- 1 Pink Floyd The Piper at the Gates of Dawn 1967-07-07  
- 2 Pink Floyd A Saucerful of Secrets         1968-06-29  
- 3 Pink Floyd Ummagumma                      1969-10-25  
- 4 Pink Floyd Atom Heart Mother              1970-10-10  
- 5 Pink Floyd Meddle                         1971-10-30  
- 6 Pink Floyd The Dark Side of the Moon      1973-03-24  
- 7 Pink Floyd Wish You Were Here             1975-09-12  
- 8 Pink Floyd Animals                        1977-01-23  
- 9 Pink Floyd The Wall                       1979-11-30  
-10 Pink Floyd The Final Cut                  1983-03-21  
-# ℹ 11 more rows</code></pre>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  rgs <span class="ot">&lt;-</span> res[[<span class="st">"release-groups"</span>]]</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">id =</span> <span class="fu">map_chr</span>(rgs, <span class="st">"id"</span>),</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">artist =</span> artist_name,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">map_chr</span>(rgs, <span class="st">"title"</span>),</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">primary_type =</span> <span class="fu">map_chr</span>(rgs, \(x) x[[<span class="st">"primary-type"</span>]] <span class="sc">%||%</span> <span class="cn">NA_character_</span>),</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">secondary_types =</span> <span class="fu">map_chr</span>(rgs, \(x) <span class="fu">paste</span>(x[[<span class="st">"secondary-types"</span>]], <span class="at">collapse =</span> <span class="st">", "</span>)),</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> <span class="fu">map_chr</span>(rgs, \(x) x[[<span class="st">"first-release-date"</span>]] <span class="sc">%||%</span> <span class="cn">NA_character_</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(primary_type <span class="sc">==</span> <span class="st">"Album"</span>, secondary_types <span class="sc">==</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cover_url =</span> <span class="fu">paste0</span>(<span class="st">"https://coverartarchive.org/release-group/"</span>, id, <span class="st">"/front-250"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(artist, title, release_date, cover_url)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(<span class="st">"albums.csv"</span>) <span class="sc">&amp;&amp;</span> <span class="fu">nrow</span>(<span class="fu">read_csv</span>(<span class="st">"albums.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  albums <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"albums.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  artists <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span>artist, <span class="sc">~</span>id,</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Pink Floyd"</span>, <span class="st">"83d91898-7763-47d7-b03b-b92132375c47"</span>,</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Stone Temple Pilots"</span>, <span class="st">"8c32bb01-58a3-453b-8050-8c0620edb0e5"</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  albums <span class="ot">&lt;-</span> <span class="fu">map2</span>(artists<span class="sc">$</span>id, artists<span class="sc">$</span>artist, fetch_albums) <span class="sc">|&gt;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(artist, release_date)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(albums, <span class="st">"albums.csv"</span>)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="album-covers" class="level2">
+<h2 class="anchored" data-anchor-id="album-covers">Album Covers</h2>
+<p>Hover your cursor over any vinyl cover to view album information.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cards <span class="ot">&lt;-</span> glue<span class="sc">::</span><span class="fu">glue</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="album-card"&gt;'</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;img src="{albums$cover_url}" alt="{albums$title}" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src=</span><span class="sc">\'</span><span class="st">https://placehold.co/250x250/222/fff?text=Cover+Unavailable</span><span class="sc">\'</span><span class="st">;" /&gt;'</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="album-popup"&gt;'</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="popup-title"&gt;{albums$title}&lt;/div&gt;'</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="popup-artist"&gt;{albums$artist}&lt;/div&gt;'</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;span class="popup-date"&gt;Released: {albums$release_date}&lt;/span&gt;'</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;/div&gt;'</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;/div&gt;'</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">'&lt;div class="album-gallery"&gt;</span><span class="sc">\n</span><span class="st">'</span>, <span class="fu">paste</span>(cards, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">'</span><span class="sc">\n</span><span class="st">&lt;/div&gt;</span><span class="sc">\n</span><span class="st">'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="album-gallery">
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/6792b6d1-4e65-3c3c-9d20-d08aa1dcfc60/front-250" alt="The Piper at the Gates of Dawn" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+The Piper at the Gates of Dawn
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1967-07-07</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/8a9caa40-b7c6-33eb-a13c-6c15f09b1c44/front-250" alt="A Saucerful of Secrets" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+A Saucerful of Secrets
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1968-06-29</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/b7aa61ae-3572-32c0-8b93-6af78ea83760/front-250" alt="Ummagumma" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Ummagumma
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1969-10-25</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/e2f503d7-5488-3fe1-b3ac-f236d9f1b44c/front-250" alt="Atom Heart Mother" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Atom Heart Mother
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1970-10-10</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/4e98c9b4-92f6-3049-b9da-a1088b623672/front-250" alt="Meddle" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Meddle
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1971-10-30</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/f5093c06-23e3-404f-aeaa-40f72885ee3a/front-250" alt="The Dark Side of the Moon" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+The Dark Side of the Moon
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1973-03-24</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/1a272023-10d3-38ee-bab3-317b55fcc21d/front-250" alt="Wish You Were Here" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Wish You Were Here
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1975-09-12</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/20c77fb4-1c9f-33c8-9d7e-c4977f11e847/front-250" alt="Animals" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Animals
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1977-01-23</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/f2026101-945b-3d05-9ef4-aa718fc3feef/front-250" alt="The Wall" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+The Wall
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1979-11-30</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/e8b7e7a3-ef56-34a5-bedf-085783c9a076/front-250" alt="The Final Cut" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+The Final Cut
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1983-03-21</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/4940b8aa-898b-3e60-9992-94e073bab6f6/front-250" alt="A Momentary Lapse of Reason" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+A Momentary Lapse of Reason
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1987-09-07</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/90878b63-f639-3c8b-aefb-190bdf3d1790/front-250" alt="The Division Bell" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+The Division Bell
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 1994-03-28</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/38b4c840-16ce-40fa-b7c0-a354b7c87178/front-250" alt="The Endless River" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+The Endless River
+</div>
+<div class="popup-artist">
+Pink Floyd
+</div>
+<span class="popup-date">Released: 2014-11-07</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/6ca130f1-8f1f-3aa2-8cfb-6cfda3ed5d21/front-250" alt="Core" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Core
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 1992-09-29</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/01d45519-54a6-3427-b0dc-222203fa5d57/front-250" alt="Purple" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Purple
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 1994-06-06</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/88c2b58d-ab28-3d7c-b719-3f8b4e3062a1/front-250" alt="Tiny Music… Songs From the Vatican Gift Shop" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Tiny Music… Songs From the Vatican Gift Shop
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 1996-03-26</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/190299e7-9232-3719-baf0-c69f78892b4c/front-250" alt="№4" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+№4
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 1999-10-26</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/f850cab8-9cf6-3cd8-8963-4c1b34735452/front-250" alt="Shangri‐La Dee Da" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Shangri‐La Dee Da
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 2001-06-19</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/3f6341ad-ba15-4d42-9478-dc57af677a42/front-250" alt="Stone Temple Pilots" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Stone Temple Pilots
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 2010-05-20</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/09b803e1-e200-47f6-a6c3-189368ec1e36/front-250" alt="Stone Temple Pilots" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Stone Temple Pilots
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 2018-03-16</span>
+</div>
+</div>
+<div class="album-card">
+<img src="https://coverartarchive.org/release-group/52c4607d-47da-401e-888a-a65cdd572ad1/front-250" alt="Perdida" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-popup">
+<div class="popup-title">
+Perdida
+</div>
+<div class="popup-artist">
+Stone Temple Pilots
+</div>
+<span class="popup-date">Released: 2020-02-07</span>
+</div>
 </div>
 </div>
 

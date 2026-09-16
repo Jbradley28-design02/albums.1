@@ -1,1 +1,93 @@
-/* css styles */
+/* Album Gallery and Vinyl Cover Styles */
+
+.album-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 28px;
+  padding: 20px 0 40px 0;
+}
+
+.album-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 6px;
+  background-color: #1a1a1a;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.album-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  z-index: 50;
+}
+
+.album-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+/* Hover Popup / Tooltip */
+.album-popup {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 108%;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  width: 220px;
+  background: rgba(20, 20, 26, 0.96);
+  color: #ffffff;
+  text-align: center;
+  padding: 12px 14px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.album-popup::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border-width: 7px;
+  border-style: solid;
+  border-color: rgba(20, 20, 26, 0.96) transparent transparent transparent;
+}
+
+.album-card:hover .album-popup {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.popup-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  line-height: 1.25;
+  color: #fff;
+}
+
+.popup-artist {
+  font-size: 0.82rem;
+  color: #a0aec0;
+  margin-bottom: 6px;
+}
+
+.popup-date {
+  font-size: 0.78rem;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}

@@ -1,7 +1,103 @@
 ---
-title: "Albums of PF&STP"
+title: "Pink Floyd & Stone Temple Pilots Albums"
+execute:
+  echo: false
 ---
 
-This is a Quarto website.
+```{r}
+#| label: setup
+#| message: false
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+library(tidyverse)
+library(knitr)
+
+albums <- read_csv("albums.csv", show_col_types = FALSE)
+
+similarity_titles <- c(
+  "The Division Bell",
+  "Purple",
+  "The Piper at the Gates of Dawn",
+  "Perdida"
+)
+
+render_gallery <- function(data) {
+  cards <- glue::glue(
+    '<div class="album-card">',
+    '<img src="{data$cover_url}" alt="{data$title} by {data$artist}" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/250x250/222/fff?text=Cover+Unavailable\';" />',
+    '<div class="album-popup">',
+    '<div class="popup-title">{data$title}</div>',
+    '<div class="popup-artist">{data$artist}</div>',
+    '<span class="popup-date">Released: {data$release_date}</span>',
+    '</div>',
+    '</div>'
+  )
+  cat(paste0('<div class="album-gallery">\n', paste(cards, collapse = "\n"), '\n</div>\n'))
+}
+```
+
+This site compares the studio album discographies of **Pink Floyd** and **Stone Temple Pilots** using release date data from MusicBrainz.
+
+## Album Similarity
+
+Albums released closest in time represent the bands' most similar era, while those furthest apart are the least similar. Hover over any album cover to see details.
+
+### Most Similar Albums (70 Days Apart)
+
+- **Pink Floyd:** *The Division Bell* (March 28, 1994)
+- **Stone Temple Pilots:** *Purple* (June 6, 1994)
+
+```{r}
+#| label: most-similar-albums
+#| results: asis
+
+albums |>
+  filter(
+    (artist == "Pink Floyd" & title == "The Division Bell") |
+    (artist == "Stone Temple Pilots" & title == "Purple")
+  ) |>
+  render_gallery()
+```
+
+### Least Similar Albums (52+ Years Apart)
+
+- **Pink Floyd:** *The Piper at the Gates of Dawn* (July 7, 1967)
+- **Stone Temple Pilots:** *Perdida* (February 7, 2020)
+
+```{r}
+#| label: least-similar-albums
+#| results: asis
+
+albums |>
+  filter(
+    (artist == "Pink Floyd" & title == "The Piper at the Gates of Dawn") |
+    (artist == "Stone Temple Pilots" & title == "Perdida")
+  ) |>
+  render_gallery()
+```
+
+## Other Albums by Band
+
+Hover your cursor over any album cover to see its details.
+
+### Pink Floyd
+
+```{r}
+#| label: pink-floyd-albums
+#| results: asis
+
+albums |>
+  filter(artist == "Pink Floyd", !title %in% similarity_titles) |>
+  render_gallery()
+```
+
+### Stone Temple Pilots
+
+```{r}
+#| label: stp-albums
+#| results: asis
+
+albums |>
+  filter(artist == "Stone Temple Pilots", !title %in% similarity_titles) |>
+  render_gallery()
+```
+
