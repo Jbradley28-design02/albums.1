@@ -38,6 +38,40 @@ render_gallery <- function(data) {
 
 This site compares the studio album discographies of **Pink Floyd** and **Stone Temple Pilots** using release date data from MusicBrainz.
 
+## Discography Timeline & Popularity
+
+The interactive chart below plots each studio album by release date and user rating from MusicBrainz. Point size indicates the number of user votes. Hover over any point to inspect an album.
+
+```{r}
+#| label: timeline-popularity-plot
+#| warning: false
+
+p <- albums |>
+  mutate(
+    date = as.Date(release_date),
+    tooltip = paste0(
+      "<b>", title, "</b><br>",
+      artist, "<br>",
+      "Released: ", release_date, "<br>",
+      "Rating: ", rating, " / 5 (", votes, " votes)"
+    )
+  ) |>
+  ggplot(aes(x = date, y = rating, color = artist, text = tooltip)) +
+  geom_point(aes(size = votes), alpha = 0.85) +
+  scale_y_continuous(limits = c(3, 5), breaks = seq(3, 5, 0.5)) +
+  scale_color_manual(values = c("Pink Floyd" = "#e76f51", "Stone Temple Pilots" = "#2a9d8f")) +
+  theme_minimal(base_size = 12) +
+  labs(
+    title = "Album Ratings & Releases (1967–2020)",
+    x = "Release Date",
+    y = "Rating (out of 5)",
+    color = "Artist",
+    size = "Votes"
+  )
+
+ggplotly(p, tooltip = "text")
+```
+
 ## Album Similarity
 
 Albums released closest in time represent the bands' most similar era, while those furthest apart are the least similar. Hover over any album cover to see details.

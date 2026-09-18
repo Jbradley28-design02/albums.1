@@ -195,7 +195,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://musicbrainz.org/ws/2/release-group?artist="</span>,</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    artist_id,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"&amp;limit=100&amp;fmt=json"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"&amp;inc=ratings&amp;limit=100&amp;fmt=json"</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">request</span>(url) <span class="sc">|&gt;</span></span>
@@ -217,28 +217,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">map_chr</span>(rgs, <span class="st">"title"</span>),</span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">primary_type =</span> <span class="fu">map_chr</span>(rgs, \(x) x[[<span class="st">"primary-type"</span>]] <span class="sc">%||%</span> <span class="cn">NA_character_</span>),</span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">secondary_types =</span> <span class="fu">map_chr</span>(rgs, \(x) <span class="fu">paste</span>(x[[<span class="st">"secondary-types"</span>]], <span class="at">collapse =</span> <span class="st">", "</span>)),</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> <span class="fu">map_chr</span>(rgs, \(x) x[[<span class="st">"first-release-date"</span>]] <span class="sc">%||%</span> <span class="cn">NA_character_</span>)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(primary_type <span class="sc">==</span> <span class="st">"Album"</span>, secondary_types <span class="sc">==</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cover_url =</span> <span class="fu">paste0</span>(<span class="st">"https://coverartarchive.org/release-group/"</span>, id, <span class="st">"/front-250"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(artist, title, release_date, cover_url)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(<span class="st">"albums.csv"</span>) <span class="sc">&amp;&amp;</span> <span class="fu">nrow</span>(<span class="fu">read_csv</span>(<span class="st">"albums.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  albums <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"albums.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  artists <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span>artist, <span class="sc">~</span>id,</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Pink Floyd"</span>, <span class="st">"83d91898-7763-47d7-b03b-b92132375c47"</span>,</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Stone Temple Pilots"</span>, <span class="st">"8c32bb01-58a3-453b-8050-8c0620edb0e5"</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  albums <span class="ot">&lt;-</span> <span class="fu">map2</span>(artists<span class="sc">$</span>id, artists<span class="sc">$</span>artist, fetch_albums) <span class="sc">|&gt;</span></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(artist, release_date)</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(albums, <span class="st">"albums.csv"</span>)</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">release_date =</span> <span class="fu">map_chr</span>(rgs, \(x) x[[<span class="st">"first-release-date"</span>]] <span class="sc">%||%</span> <span class="cn">NA_character_</span>),</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">rating =</span> <span class="fu">map_dbl</span>(rgs, \(x) <span class="fu">as.numeric</span>(x[[<span class="st">"rating"</span>]][[<span class="st">"value"</span>]] <span class="sc">%||%</span> <span class="cn">NA_real_</span>)),</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">votes =</span> <span class="fu">map_int</span>(rgs, \(x) <span class="fu">as.integer</span>(x[[<span class="st">"rating"</span>]][[<span class="st">"votes-count"</span>]] <span class="sc">%||%</span> <span class="dv">0</span>L))</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(primary_type <span class="sc">==</span> <span class="st">"Album"</span>, secondary_types <span class="sc">==</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cover_url =</span> <span class="fu">paste0</span>(<span class="st">"https://coverartarchive.org/release-group/"</span>, id, <span class="st">"/front-250"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(artist, title, release_date, rating, votes, cover_url)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(<span class="st">"albums.csv"</span>) <span class="sc">&amp;&amp;</span> <span class="fu">nrow</span>(<span class="fu">read_csv</span>(<span class="st">"albums.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  albums <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"albums.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  artists <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span>artist, <span class="sc">~</span>id,</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Pink Floyd"</span>, <span class="st">"83d91898-7763-47d7-b03b-b92132375c47"</span>,</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Stone Temple Pilots"</span>, <span class="st">"8c32bb01-58a3-453b-8050-8c0620edb0e5"</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  albums <span class="ot">&lt;-</span> <span class="fu">map2</span>(artists<span class="sc">$</span>id, artists<span class="sc">$</span>artist, fetch_albums) <span class="sc">|&gt;</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list_rbind</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(artist, release_date)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(albums, <span class="st">"albums.csv"</span>)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="album-covers" class="level2">

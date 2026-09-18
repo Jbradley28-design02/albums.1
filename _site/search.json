@@ -7,6 +7,13 @@
     "text": "This site compares the studio album discographies of Pink Floyd and Stone Temple Pilots using release date data from MusicBrainz."
   },
   {
+    "objectID": "index.html#discography-timeline-popularity",
+    "href": "index.html#discography-timeline-popularity",
+    "title": "Pink Floyd & Stone Temple Pilots Albums",
+    "section": "Discography Timeline & Popularity",
+    "text": "Discography Timeline & Popularity\nThe interactive chart below plots each studio album by release date and user rating from MusicBrainz. Point size indicates the number of user votes. Hover over any point to inspect an album."
+  },
+  {
     "objectID": "index.html#album-similarity",
     "href": "index.html#album-similarity",
     "title": "Pink Floyd & Stone Temple Pilots Albums",
@@ -25,7 +32,7 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "About this site"
+    "text": "This project explores and compares the studio album discographies of Pink Floyd and Stone Temple Pilots.\n\nPurpose & Methodology\nBy analyzing release dates from 1967 to 2020, this site investigates how the eras of a classic British progressive rock giant and an American 1990s alternative rock icon intersect. Albums released closest in time represent their most similar chronological era, while those furthest apart highlight their generational span.\n\n\nData Sources\n\nDiscography Data: MusicBrainz API for release dates, metadata, and album ratings.\nAlbum Artwork: Cover Art Archive.\n\n\n\nSource Code\nThe code and analysis were built with R, Quarto, and the tidyverse. You can explore the repository on GitHub."
   },
   {
     "objectID": "albums.html",
@@ -39,7 +46,7 @@
     "href": "albums.html#download-albums",
     "title": "Albums from MusicBrainz",
     "section": "Download Albums",
-    "text": "Download Albums\nWe fetch the release groups for Pink Floyd and Stone Temple Pilots via the MusicBrainz API, filtering for studio albums.\n\nfetch_albums &lt;- function(artist_id, artist_name) {\n  Sys.sleep(1.5)\n  url &lt;- paste0(\n    \"https://musicbrainz.org/ws/2/release-group?artist=\",\n    artist_id,\n    \"&limit=100&fmt=json\"\n  )\n  \n  res &lt;- request(url) |&gt;\n    req_headers(\"User-Agent\" = \"CourseProject/1.0 (student@example.edu)\") |&gt;\n    req_throttle(rate = 0.5) |&gt;\n    req_retry(\n      max_tries = 5,\n      is_transient = \\(resp) resp_status(resp) %in% c(429, 503),\n      after = \\(resp) 3\n    ) |&gt;\n    req_perform() |&gt;\n    resp_body_json()\n  \n  rgs &lt;- res[[\"release-groups\"]]\n  \n  tibble(\n    id = map_chr(rgs, \"id\"),\n    artist = artist_name,\n    title = map_chr(rgs, \"title\"),\n    primary_type = map_chr(rgs, \\(x) x[[\"primary-type\"]] %||% NA_character_),\n    secondary_types = map_chr(rgs, \\(x) paste(x[[\"secondary-types\"]], collapse = \", \")),\n    release_date = map_chr(rgs, \\(x) x[[\"first-release-date\"]] %||% NA_character_)\n  ) |&gt;\n    filter(primary_type == \"Album\", secondary_types == \"\") |&gt;\n    mutate(cover_url = paste0(\"https://coverartarchive.org/release-group/\", id, \"/front-250\")) |&gt;\n    select(artist, title, release_date, cover_url)\n}\n\nif (file.exists(\"albums.csv\") && nrow(read_csv(\"albums.csv\", show_col_types = FALSE)) &gt; 0) {\n  albums &lt;- read_csv(\"albums.csv\", show_col_types = FALSE)\n} else {\n  artists &lt;- tribble(\n    ~artist, ~id,\n    \"Pink Floyd\", \"83d91898-7763-47d7-b03b-b92132375c47\",\n    \"Stone Temple Pilots\", \"8c32bb01-58a3-453b-8050-8c0620edb0e5\"\n  )\n\n  albums &lt;- map2(artists$id, artists$artist, fetch_albums) |&gt;\n    list_rbind() |&gt;\n    arrange(artist, release_date)\n\n  write_csv(albums, \"albums.csv\")\n}"
+    "text": "Download Albums\nWe fetch the release groups for Pink Floyd and Stone Temple Pilots via the MusicBrainz API, filtering for studio albums.\n\nfetch_albums &lt;- function(artist_id, artist_name) {\n  Sys.sleep(1.5)\n  url &lt;- paste0(\n    \"https://musicbrainz.org/ws/2/release-group?artist=\",\n    artist_id,\n    \"&inc=ratings&limit=100&fmt=json\"\n  )\n  \n  res &lt;- request(url) |&gt;\n    req_headers(\"User-Agent\" = \"CourseProject/1.0 (student@example.edu)\") |&gt;\n    req_throttle(rate = 0.5) |&gt;\n    req_retry(\n      max_tries = 5,\n      is_transient = \\(resp) resp_status(resp) %in% c(429, 503),\n      after = \\(resp) 3\n    ) |&gt;\n    req_perform() |&gt;\n    resp_body_json()\n  \n  rgs &lt;- res[[\"release-groups\"]]\n  \n  tibble(\n    id = map_chr(rgs, \"id\"),\n    artist = artist_name,\n    title = map_chr(rgs, \"title\"),\n    primary_type = map_chr(rgs, \\(x) x[[\"primary-type\"]] %||% NA_character_),\n    secondary_types = map_chr(rgs, \\(x) paste(x[[\"secondary-types\"]], collapse = \", \")),\n    release_date = map_chr(rgs, \\(x) x[[\"first-release-date\"]] %||% NA_character_),\n    rating = map_dbl(rgs, \\(x) as.numeric(x[[\"rating\"]][[\"value\"]] %||% NA_real_)),\n    votes = map_int(rgs, \\(x) as.integer(x[[\"rating\"]][[\"votes-count\"]] %||% 0L))\n  ) |&gt;\n    filter(primary_type == \"Album\", secondary_types == \"\") |&gt;\n    mutate(cover_url = paste0(\"https://coverartarchive.org/release-group/\", id, \"/front-250\")) |&gt;\n    select(artist, title, release_date, rating, votes, cover_url)\n}\n\nif (file.exists(\"albums.csv\") && nrow(read_csv(\"albums.csv\", show_col_types = FALSE)) &gt; 0) {\n  albums &lt;- read_csv(\"albums.csv\", show_col_types = FALSE)\n} else {\n  artists &lt;- tribble(\n    ~artist, ~id,\n    \"Pink Floyd\", \"83d91898-7763-47d7-b03b-b92132375c47\",\n    \"Stone Temple Pilots\", \"8c32bb01-58a3-453b-8050-8c0620edb0e5\"\n  )\n\n  albums &lt;- map2(artists$id, artists$artist, fetch_albums) |&gt;\n    list_rbind() |&gt;\n    arrange(artist, release_date)\n\n  write_csv(albums, \"albums.csv\")\n}"
   },
   {
     "objectID": "albums.html#album-covers",
