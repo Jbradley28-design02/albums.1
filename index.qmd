@@ -25,10 +25,12 @@ similarity_titles <- c(
 render_gallery <- function(data) {
   cards <- glue::glue(
     '<div class="album-card">',
+    '<div class="vinyl-disc"></div>',
     '<img src="{data$cover_url}" alt="{data$title} by {data$artist}" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/250x250/222/fff?text=Cover+Unavailable\';" />',
     '<div class="album-popup">',
     '<div class="popup-title">{data$title}</div>',
     '<div class="popup-artist">{data$artist}</div>',
+    '<div style="margin-bottom: 5px;"><span class="popup-date">★ {data$rating} / 5</span></div>',
     '<span class="popup-date">Released: {data$release_date}</span>',
     '</div>',
     '</div>'
@@ -57,6 +59,18 @@ p <- albums |>
   scale_y_continuous(limits = c(3, 5), breaks = seq(3, 5, 0.5)) +
   scale_color_manual(values = c("Pink Floyd" = "#e76f51", "Stone Temple Pilots" = "#2a9d8f")) +
   theme_minimal(base_size = 12) +
+  theme(
+    plot.background = element_rect(fill = "#22252a", color = NA),
+    panel.background = element_rect(fill = "#22252a", color = NA),
+    text = element_text(color = "#f8fafc"),
+    axis.text = element_text(color = "#94a3b8"),
+    axis.title = element_text(color = "#e2e8f0"),
+    panel.grid.major = element_line(color = "#334155"),
+    panel.grid.minor = element_blank(),
+    legend.background = element_rect(fill = "#22252a", color = NA),
+    legend.text = element_text(color = "#e2e8f0"),
+    legend.title = element_text(color = "#f8fafc")
+  ) +
   labs(
     title = "Album Ratings & Releases (1967–2020)",
     x = "Release Date",
