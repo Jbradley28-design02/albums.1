@@ -21,7 +21,7 @@
   z-index: 50;
 }
 
-/* Vinyl record behind album jacket */
+/* Real Vinyl Record behind album jacket */
 .vinyl-disc {
   position: absolute;
   top: 4%;
@@ -29,39 +29,15 @@
   width: 92%;
   height: 92%;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    #b91c1c 0%,
-    #b91c1c 18%,
-    #0a0a0a 18.5%,
-    #171717 32%,
-    #0a0a0a 33%,
-    #171717 52%,
-    #0a0a0a 53%,
-    #171717 72%,
-    #0a0a0a 73%,
-    #171717 100%
-  );
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+  object-fit: cover;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.75);
   transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
   z-index: 1;
-}
-
-/* Spindle hole in center of vinyl */
-.vinyl-disc::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  background: #ffffff;
-  border-radius: 50%;
+  background-color: #0d0d0d;
 }
 
 .album-card:hover .vinyl-disc {
-  transform: translateX(38%) rotate(30deg);
+  transform: translateX(42%) rotate(25deg);
 }
 
 .album-cover {

@@ -25,7 +25,7 @@ similarity_titles <- c(
 render_gallery <- function(data) {
   cards <- glue::glue(
     '<div class="album-card">',
-    '<div class="vinyl-disc"></div>',
+    '<img src="{data$vinyl_url}" alt="{data$title} vinyl" class="vinyl-disc" loading="lazy" />',
     '<img src="{data$cover_url}" alt="{data$title} by {data$artist}" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/250x250/222/fff?text=Cover+Unavailable\';" />',
     '<div class="album-popup">',
     '<div class="popup-title">{data$title}</div>',
