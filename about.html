@@ -42,10 +42,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-5453c8eb392fbb9e83e403fa6f01b86a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-4da8503a74ad68ddb1f8af1e1bff6243.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -114,8 +114,16 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#purpose-methodology" id="toc-purpose-methodology" class="nav-link active" data-scroll-target="#purpose-methodology">Purpose &amp; Methodology</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
+  <li><a href="#source-code" id="toc-source-code" class="nav-link" data-scroll-target="#source-code">Source Code</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -139,11 +147,108 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>About this site</p>
+<p>This project explores and compares the studio album discographies of <strong>Pink Floyd</strong> and <strong>Stone Temple Pilots</strong>.</p>
+<section id="purpose-methodology" class="level3">
+<h3 class="anchored" data-anchor-id="purpose-methodology">Purpose &amp; Methodology</h3>
+<p>By analyzing release dates from 1967 to 2020, this site investigates how the eras of a classic British progressive rock giant and an American 1990s alternative rock icon intersect. Albums released closest in time represent their most similar chronological era, while those furthest apart highlight their generational span.</p>
+</section>
+<section id="data-sources" class="level3">
+<h3 class="anchored" data-anchor-id="data-sources">Data Sources</h3>
+<ul>
+<li><strong>Discography Data:</strong> <a href="https://musicbrainz.org/">MusicBrainz API</a> for release dates, metadata, and album ratings.</li>
+<li><strong>Album Artwork:</strong> <a href="https://coverartarchive.org/">Cover Art Archive</a>.</li>
+</ul>
+</section>
+<section id="source-code" class="level3">
+<h3 class="anchored" data-anchor-id="source-code">Source Code</h3>
+<p>The code and analysis were built with R, Quarto, and the tidyverse. You can explore the repository on <a href="https://github.com/Jbradley28-design02/albums.1">GitHub</a>.</p>
 
 
+</section>
 
 </main> <!-- /main -->
+<div id="audio-player-bar">
+  <img id="audio-bar-disc" class="mini-disc" src="" alt="spinning disc">
+  <span id="audio-bar-text">Playing...</span>
+  <button class="stop-btn" onclick="stopAudio()" title="Stop music">✕</button>
+</div>
+
+<script>
+let currentAudio = null;
+let currentCard = null;
+
+function handleCardPlay(e, overlayBtn) {
+  e.stopPropagation();
+  const card = overlayBtn.closest('.album-card');
+  const audioUrl = card.getAttribute('data-audio');
+  const song = card.getAttribute('data-song');
+  const artist = card.getAttribute('data-artist');
+  const title = card.getAttribute('data-title');
+  const vinylImg = card.getAttribute('data-vinyl');
+
+  const bar = document.getElementById('audio-player-bar');
+  const barText = document.getElementById('audio-bar-text');
+  const barDisc = document.getElementById('audio-bar-disc');
+
+  // If already playing this track: pause it
+  if (currentCard === card && currentAudio && !currentAudio.paused) {
+    currentAudio.pause();
+    card.classList.remove('is-playing');
+    overlayBtn.innerHTML = '▶';
+    if (bar) bar.classList.remove('active');
+    return;
+  }
+
+  // Stop previous track if any
+  if (currentAudio) {
+    currentAudio.pause();
+    if (currentCard) {
+      currentCard.classList.remove('is-playing');
+      const prevBtn = currentCard.querySelector('.album-play-overlay');
+      if (prevBtn) prevBtn.innerHTML = '▶';
+    }
+  }
+
+  // Play new track
+  currentAudio = new Audio(audioUrl);
+  currentCard = card;
+  card.classList.add('is-playing');
+  overlayBtn.innerHTML = '⏸';
+
+  if (bar && barText) {
+    barText.innerHTML = '<b>' + song + '</b> &bull; ' + artist + ' (<em>' + title + '</em>)';
+    if (barDisc) barDisc.src = vinylImg;
+    bar.classList.add('active');
+  }
+
+  currentAudio.play().catch(function(err) {
+    console.error("Audio playback error:", err);
+  });
+
+  currentAudio.onended = function() {
+    card.classList.remove('is-playing');
+    overlayBtn.innerHTML = '▶';
+    if (bar) bar.classList.remove('active');
+    currentAudio = null;
+    currentCard = null;
+  };
+}
+
+function stopAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  if (currentCard) {
+    currentCard.classList.remove('is-playing');
+    const prevBtn = currentCard.querySelector('.album-play-overlay');
+    if (prevBtn) prevBtn.innerHTML = '▶';
+    currentCard = null;
+  }
+  const bar = document.getElementById('audio-player-bar');
+  if (bar) bar.classList.remove('active');
+}
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
