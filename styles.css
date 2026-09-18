@@ -91,3 +91,29 @@
   border-radius: 12px;
   display: inline-block;
 }
+
+/* Floating Chart Hover Tooltip */
+#album-chart-tooltip {
+  position: fixed;
+  display: none;
+  pointer-events: none;
+  z-index: 9999;
+  background: rgba(20, 20, 28, 0.96);
+  color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+  width: 170px;
+  transition: opacity 0.15s ease;
+}
+
+#album-chart-tooltip img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
