@@ -167,6 +167,88 @@ ul.task-list li input[type="checkbox"] {
 </section>
 
 </main> <!-- /main -->
+<div id="audio-player-bar">
+  <img id="audio-bar-disc" class="mini-disc" src="" alt="spinning disc">
+  <span id="audio-bar-text">Playing...</span>
+  <button class="stop-btn" onclick="stopAudio()" title="Stop music">✕</button>
+</div>
+
+<script>
+let currentAudio = null;
+let currentCard = null;
+
+function handleCardPlay(e, overlayBtn) {
+  e.stopPropagation();
+  const card = overlayBtn.closest('.album-card');
+  const audioUrl = card.getAttribute('data-audio');
+  const song = card.getAttribute('data-song');
+  const artist = card.getAttribute('data-artist');
+  const title = card.getAttribute('data-title');
+  const vinylImg = card.getAttribute('data-vinyl');
+
+  const bar = document.getElementById('audio-player-bar');
+  const barText = document.getElementById('audio-bar-text');
+  const barDisc = document.getElementById('audio-bar-disc');
+
+  // If already playing this track: pause it
+  if (currentCard === card && currentAudio && !currentAudio.paused) {
+    currentAudio.pause();
+    card.classList.remove('is-playing');
+    overlayBtn.innerHTML = '▶';
+    if (bar) bar.classList.remove('active');
+    return;
+  }
+
+  // Stop previous track if any
+  if (currentAudio) {
+    currentAudio.pause();
+    if (currentCard) {
+      currentCard.classList.remove('is-playing');
+      const prevBtn = currentCard.querySelector('.album-play-overlay');
+      if (prevBtn) prevBtn.innerHTML = '▶';
+    }
+  }
+
+  // Play new track
+  currentAudio = new Audio(audioUrl);
+  currentCard = card;
+  card.classList.add('is-playing');
+  overlayBtn.innerHTML = '⏸';
+
+  if (bar && barText) {
+    barText.innerHTML = '<b>' + song + '</b> &bull; ' + artist + ' (<em>' + title + '</em>)';
+    if (barDisc) barDisc.src = vinylImg;
+    bar.classList.add('active');
+  }
+
+  currentAudio.play().catch(function(err) {
+    console.error("Audio playback error:", err);
+  });
+
+  currentAudio.onended = function() {
+    card.classList.remove('is-playing');
+    overlayBtn.innerHTML = '▶';
+    if (bar) bar.classList.remove('active');
+    currentAudio = null;
+    currentCard = null;
+  };
+}
+
+function stopAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  if (currentCard) {
+    currentCard.classList.remove('is-playing');
+    const prevBtn = currentCard.querySelector('.album-play-overlay');
+    if (prevBtn) prevBtn.innerHTML = '▶';
+    currentCard = null;
+  }
+  const bar = document.getElementById('audio-player-bar');
+  if (bar) bar.classList.remove('active');
+}
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

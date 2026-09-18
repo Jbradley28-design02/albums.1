@@ -13,6 +13,7 @@ format:
   html:
     theme: darkly
     css: styles.css
+    include-after-body: audio-player.html
     toc: true
 
 

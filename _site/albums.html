@@ -247,22 +247,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="album-covers">Album Covers</h2>
 <p>Hover your cursor over any vinyl cover to view album information.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cards <span class="ot">&lt;-</span> glue<span class="sc">::</span><span class="fu">glue</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="album-card"&gt;'</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="album-card" data-audio="{albums$audio_url}" data-title="{albums$title}" data-song="{albums$best_song}" data-artist="{albums$artist}" data-vinyl="{albums$vinyl_url}"&gt;'</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;img src="{albums$vinyl_url}" alt="{albums$title} vinyl" class="vinyl-disc" loading="lazy" /&gt;'</span>,</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;img src="{albums$cover_url}" alt="{albums$title}" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src=</span><span class="sc">\'</span><span class="st">https://placehold.co/250x250/222/fff?text=Cover+Unavailable</span><span class="sc">\'</span><span class="st">;" /&gt;'</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="album-popup"&gt;'</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="popup-title"&gt;{albums$title}&lt;/div&gt;'</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="popup-artist"&gt;{albums$artist}&lt;/div&gt;'</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div style="margin-bottom: 5px;"&gt;&lt;span class="popup-date"&gt;★ {albums$rating} / 5&lt;/span&gt;&lt;/div&gt;'</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;span class="popup-date"&gt;Released: {albums$release_date}&lt;/span&gt;'</span>,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;/div&gt;'</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;/div&gt;'</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">'&lt;div class="album-gallery"&gt;</span><span class="sc">\n</span><span class="st">'</span>, <span class="fu">paste</span>(cards, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">'</span><span class="sc">\n</span><span class="st">&lt;/div&gt;</span><span class="sc">\n</span><span class="st">'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play {albums$best_song}"&gt;▶&lt;/div&gt;'</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="album-popup"&gt;'</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="popup-title"&gt;{albums$title}&lt;/div&gt;'</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="popup-artist"&gt;{albums$artist}&lt;/div&gt;'</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div style="margin-bottom: 5px;"&gt;&lt;span class="popup-date"&gt;★ {albums$rating} / 5&lt;/span&gt;&lt;/div&gt;'</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;span class="popup-date"&gt;Released: {albums$release_date}&lt;/span&gt;'</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;div class="popup-song"&gt;🎵 {albums$best_song}&lt;/div&gt;'</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;/div&gt;'</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">'&lt;/div&gt;'</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">'&lt;div class="album-gallery"&gt;</span><span class="sc">\n</span><span class="st">'</span>, <span class="fu">paste</span>(cards, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="st">'</span><span class="sc">\n</span><span class="st">&lt;/div&gt;</span><span class="sc">\n</span><span class="st">'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="album-gallery">
-<div class="album-card">
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/01/6a/4d/016a4db2-7b28-f79c-3b71-b9f37efb847f/mzaf_2105825885215249262.plus.aac.p.m4a" data-title="The Piper at the Gates of Dawn" data-song="Astronomy Domine" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/1f715142-a0ef-48c8-9e72-c402e5bad13f/14466625980-250.jpg">
 <img src="https://coverartarchive.org/release/1f715142-a0ef-48c8-9e72-c402e5bad13f/14466625980-250.jpg" alt="The Piper at the Gates of Dawn vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/6792b6d1-4e65-3c3c-9d20-d08aa1dcfc60/front-250" alt="The Piper at the Gates of Dawn" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Astronomy Domine">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 The Piper at the Gates of Dawn
@@ -274,10 +279,16 @@ Pink Floyd
 <span class="popup-date">★ 3.75 / 5</span>
 </div>
 <span class="popup-date">Released: 1967-07-07</span>
+<div class="popup-song">
+🎵 Astronomy Domine
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/01/9a/4d/019a4dc9-9302-9b0a-7a2d-3f997b6f46d5/mzaf_14093467796973997824.plus.aac.p.m4a" data-title="A Saucerful of Secrets" data-song="Set the Controls for the Heart of the Sun" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/05c5e2bc-3daf-344e-bf9a-d0e16cad13ca/10031151157-250.jpg">
 <img src="https://coverartarchive.org/release/05c5e2bc-3daf-344e-bf9a-d0e16cad13ca/10031151157-250.jpg" alt="A Saucerful of Secrets vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/8a9caa40-b7c6-33eb-a13c-6c15f09b1c44/front-250" alt="A Saucerful of Secrets" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Set the Controls for the Heart of the Sun">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 A Saucerful of Secrets
@@ -289,10 +300,16 @@ Pink Floyd
 <span class="popup-date">★ 3.85 / 5</span>
 </div>
 <span class="popup-date">Released: 1968-06-29</span>
+<div class="popup-song">
+🎵 Set the Controls for the Heart of the Sun
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1d/9b/d8/1d9bd882-3998-1980-274b-6e09eb82a84f/mzaf_8509596537731017606.plus.aac.p.m4a" data-title="Ummagumma" data-song="Careful with That Axe, Eugene" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/14e596dc-cbd4-4892-b863-657d394609c2/32814859701-250.jpg">
 <img src="https://coverartarchive.org/release/14e596dc-cbd4-4892-b863-657d394609c2/32814859701-250.jpg" alt="Ummagumma vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/b7aa61ae-3572-32c0-8b93-6af78ea83760/front-250" alt="Ummagumma" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Careful with That Axe, Eugene">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Ummagumma
@@ -304,10 +321,16 @@ Pink Floyd
 <span class="popup-date">★ 3.6 / 5</span>
 </div>
 <span class="popup-date">Released: 1969-10-25</span>
+<div class="popup-song">
+🎵 Careful with That Axe, Eugene
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/56/33/51/56335136-1941-51e7-9b02-26c5a61b7b14/mzaf_15550080706636102507.plus.aac.p.m4a" data-title="Atom Heart Mother" data-song="Summer '68" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/07d1c708-1bf4-312f-a6c4-5cfcc29eea05/7893030775-250.jpg">
 <img src="https://coverartarchive.org/release/07d1c708-1bf4-312f-a6c4-5cfcc29eea05/7893030775-250.jpg" alt="Atom Heart Mother vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/e2f503d7-5488-3fe1-b3ac-f236d9f1b44c/front-250" alt="Atom Heart Mother" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Summer '68">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Atom Heart Mother
@@ -319,10 +342,16 @@ Pink Floyd
 <span class="popup-date">★ 4.15 / 5</span>
 </div>
 <span class="popup-date">Released: 1970-10-10</span>
+<div class="popup-song">
+🎵 Summer ’68
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/58/4b/a9/584ba9c2-26d8-9908-ec1f-30fd42064da3/mzaf_2143564703840979672.plus.aac.p.m4a" data-title="Meddle" data-song="One of These Days" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/09ed5877-bb22-4a26-8ec7-c95e5ee70fd3/14263259564-250.jpg">
 <img src="https://coverartarchive.org/release/09ed5877-bb22-4a26-8ec7-c95e5ee70fd3/14263259564-250.jpg" alt="Meddle vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/4e98c9b4-92f6-3049-b9da-a1088b623672/front-250" alt="Meddle" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play One of These Days">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Meddle
@@ -334,10 +363,16 @@ Pink Floyd
 <span class="popup-date">★ 4.25 / 5</span>
 </div>
 <span class="popup-date">Released: 1971-10-30</span>
+<div class="popup-song">
+🎵 One of These Days
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/3e/e5/993ee5ea-6f6e-90c0-1206-1005ff67ed51/mzaf_5024889116279985513.plus.aac.p.m4a" data-title="The Dark Side of the Moon" data-song="Money" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/956fbc58-362d-43b8-b880-3779e0508559/34025424486-250.jpg">
 <img src="https://coverartarchive.org/release/956fbc58-362d-43b8-b880-3779e0508559/34025424486-250.jpg" alt="The Dark Side of the Moon vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/f5093c06-23e3-404f-aeaa-40f72885ee3a/front-250" alt="The Dark Side of the Moon" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Money">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 The Dark Side of the Moon
@@ -349,10 +384,16 @@ Pink Floyd
 <span class="popup-date">★ 4.75 / 5</span>
 </div>
 <span class="popup-date">Released: 1973-03-24</span>
+<div class="popup-song">
+🎵 Money
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ca/73/b0/ca73b075-9f43-5ba2-4a9c-494d2e2b1d6e/mzaf_16835053037302358726.plus.aac.p.m4a" data-title="Wish You Were Here" data-song="Wish You Were Here" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/264aa33b-44db-4ff7-bddb-9ddd1a1716c3/30262769576-250.jpg">
 <img src="https://coverartarchive.org/release/264aa33b-44db-4ff7-bddb-9ddd1a1716c3/30262769576-250.jpg" alt="Wish You Were Here vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/1a272023-10d3-38ee-bab3-317b55fcc21d/front-250" alt="Wish You Were Here" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Wish You Were Here">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Wish You Were Here
@@ -364,10 +405,16 @@ Pink Floyd
 <span class="popup-date">★ 4.65 / 5</span>
 </div>
 <span class="popup-date">Released: 1975-09-12</span>
+<div class="popup-song">
+🎵 Wish You Were Here
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/78/34/66/783466b7-b375-f371-b156-c6d58c2c70bb/mzaf_617343880395058682.plus.aac.p.m4a" data-title="Animals" data-song="Dogs" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/794fc579-651c-4446-b5a7-09bab5ff51fa/34362136618-250.jpg">
 <img src="https://coverartarchive.org/release/794fc579-651c-4446-b5a7-09bab5ff51fa/34362136618-250.jpg" alt="Animals vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/20c77fb4-1c9f-33c8-9d7e-c4977f11e847/front-250" alt="Animals" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Dogs">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Animals
@@ -379,10 +426,16 @@ Pink Floyd
 <span class="popup-date">★ 4.5 / 5</span>
 </div>
 <span class="popup-date">Released: 1977-01-23</span>
+<div class="popup-song">
+🎵 Dogs
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/af/1b/39/af1b3957-d1d3-06c9-d547-633cb081b677/mzaf_3421307010114212683.plus.aac.p.m4a" data-title="The Wall" data-song="Comfortably Numb" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/57af82e7-3bea-4789-ab4f-d2084555c2fb/20640056490-250.jpg">
 <img src="https://coverartarchive.org/release/57af82e7-3bea-4789-ab4f-d2084555c2fb/20640056490-250.jpg" alt="The Wall vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/f2026101-945b-3d05-9ef4-aa718fc3feef/front-250" alt="The Wall" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Comfortably Numb">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 The Wall
@@ -394,10 +447,16 @@ Pink Floyd
 <span class="popup-date">★ 4.5 / 5</span>
 </div>
 <span class="popup-date">Released: 1979-11-30</span>
+<div class="popup-song">
+🎵 Comfortably Numb
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a7/93/f2/a793f2da-3764-cda4-7cfb-e53f97d59354/mzaf_15517150928452832090.plus.aac.p.m4a" data-title="The Final Cut" data-song="The Gunner's Dream" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/0867feee-c4f9-3e56-b3a6-e94fbe65c40b/8080975550-250.jpg">
 <img src="https://coverartarchive.org/release/0867feee-c4f9-3e56-b3a6-e94fbe65c40b/8080975550-250.jpg" alt="The Final Cut vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/e8b7e7a3-ef56-34a5-bedf-085783c9a076/front-250" alt="The Final Cut" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play The Gunner's Dream">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 The Final Cut
@@ -409,10 +468,16 @@ Pink Floyd
 <span class="popup-date">★ 3.65 / 5</span>
 </div>
 <span class="popup-date">Released: 1983-03-21</span>
+<div class="popup-song">
+🎵 The Gunner’s Dream
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6f/fc/fb/6ffcfb2f-9492-0b1c-5931-0d8edf62f42d/mzaf_15489286097221208152.plus.aac.p.m4a" data-title="A Momentary Lapse of Reason" data-song="Learning to Fly" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/03e8135c-3eca-4384-ad4c-77412866b960/32629085685-250.jpg">
 <img src="https://coverartarchive.org/release/03e8135c-3eca-4384-ad4c-77412866b960/32629085685-250.jpg" alt="A Momentary Lapse of Reason vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/4940b8aa-898b-3e60-9992-94e073bab6f6/front-250" alt="A Momentary Lapse of Reason" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Learning to Fly">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 A Momentary Lapse of Reason
@@ -424,10 +489,16 @@ Pink Floyd
 <span class="popup-date">★ 3.9 / 5</span>
 </div>
 <span class="popup-date">Released: 1987-09-07</span>
+<div class="popup-song">
+🎵 Learning to Fly
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/13/7e/9a/137e9a0b-3143-127b-206f-9b785a4f70f1/mzaf_10401000737640341623.plus.aac.p.m4a" data-title="The Division Bell" data-song="High Hopes" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/00f4874a-44cb-4179-be90-b55eeff0fdfa/14645428610-250.jpg">
 <img src="https://coverartarchive.org/release/00f4874a-44cb-4179-be90-b55eeff0fdfa/14645428610-250.jpg" alt="The Division Bell vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/90878b63-f639-3c8b-aefb-190bdf3d1790/front-250" alt="The Division Bell" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play High Hopes">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 The Division Bell
@@ -439,10 +510,16 @@ Pink Floyd
 <span class="popup-date">★ 3.9 / 5</span>
 </div>
 <span class="popup-date">Released: 1994-03-28</span>
+<div class="popup-song">
+🎵 High Hopes
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/3a/2e/b9/3a2eb9c1-2f28-8b29-92ee-593336ef33d7/mzaf_9483021556322988032.plus.aac.p.m4a" data-title="The Endless River" data-song="Louder Than Words" data-artist="Pink Floyd" data-vinyl="https://coverartarchive.org/release/2a7560b9-175a-42a1-821d-7e76bb5bf26c/8890394813-250.jpg">
 <img src="https://coverartarchive.org/release/2a7560b9-175a-42a1-821d-7e76bb5bf26c/8890394813-250.jpg" alt="The Endless River vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/38b4c840-16ce-40fa-b7c0-a354b7c87178/front-250" alt="The Endless River" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Louder Than Words">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 The Endless River
@@ -454,10 +531,16 @@ Pink Floyd
 <span class="popup-date">★ 3.1 / 5</span>
 </div>
 <span class="popup-date">Released: 2014-11-07</span>
+<div class="popup-song">
+🎵 Louder Than Words
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/7e/09/a97e0901-0a7d-f494-24ed-36cf55bb0edc/mzaf_14327662302509701668.plus.aac.p.m4a" data-title="Core" data-song="Plush" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/786ff5b9-804e-48f6-be14-4ebf77b03eb8/23792220553-250.jpg">
 <img src="https://coverartarchive.org/release/786ff5b9-804e-48f6-be14-4ebf77b03eb8/23792220553-250.jpg" alt="Core vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/6ca130f1-8f1f-3aa2-8cfb-6cfda3ed5d21/front-250" alt="Core" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Plush">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Core
@@ -469,10 +552,16 @@ Stone Temple Pilots
 <span class="popup-date">★ 4.25 / 5</span>
 </div>
 <span class="popup-date">Released: 1992-09-29</span>
+<div class="popup-song">
+🎵 Plush
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/47/ae/ac/47aeac9f-9c0e-0d88-2c9b-b23cf5927b20/mzaf_13101111828764306247.plus.aac.p.m4a" data-title="Purple" data-song="Interstate Love Song" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/36b8f767-c4c0-4ba1-becd-f40a452303d5/19375388832-250.jpg">
 <img src="https://coverartarchive.org/release/36b8f767-c4c0-4ba1-becd-f40a452303d5/19375388832-250.jpg" alt="Purple vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/01d45519-54a6-3427-b0dc-222203fa5d57/front-250" alt="Purple" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Interstate Love Song">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Purple
@@ -484,10 +573,16 @@ Stone Temple Pilots
 <span class="popup-date">★ 4.2 / 5</span>
 </div>
 <span class="popup-date">Released: 1994-06-06</span>
+<div class="popup-song">
+🎵 Interstate Love Song
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/03/f5/d1/03f5d12b-a217-c0af-953b-fd07f405e104/mzaf_4796226997594795877.plus.aac.p.m4a" data-title="Tiny Music… Songs From the Vatican Gift Shop" data-song="Trippin' on a Hole in a Paper Heart" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/2e61f827-8e0a-4634-ab3d-377f6e84f7a4/31684901538-250.jpg">
 <img src="https://coverartarchive.org/release/2e61f827-8e0a-4634-ab3d-377f6e84f7a4/31684901538-250.jpg" alt="Tiny Music… Songs From the Vatican Gift Shop vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/88c2b58d-ab28-3d7c-b719-3f8b4e3062a1/front-250" alt="Tiny Music… Songs From the Vatican Gift Shop" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Trippin' on a Hole in a Paper Heart">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Tiny Music… Songs From the Vatican Gift Shop
@@ -499,10 +594,16 @@ Stone Temple Pilots
 <span class="popup-date">★ 3.65 / 5</span>
 </div>
 <span class="popup-date">Released: 1996-03-26</span>
+<div class="popup-song">
+🎵 Trippin’ on a Hole in a Paper Heart
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/11/08/97/1108976d-b229-8fbd-dc1b-8e5d3b79de46/mzaf_1988017616037187698.plus.aac.p.m4a" data-title="№4" data-song="Sour Girl" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/0e11c681-40ee-4f77-997e-27a142b9cdec/45137258853-250.jpg">
 <img src="https://coverartarchive.org/release/0e11c681-40ee-4f77-997e-27a142b9cdec/45137258853-250.jpg" alt="№4 vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/190299e7-9232-3719-baf0-c69f78892b4c/front-250" alt="№4" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Sour Girl">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 №4
@@ -514,10 +615,16 @@ Stone Temple Pilots
 <span class="popup-date">★ 3.35 / 5</span>
 </div>
 <span class="popup-date">Released: 1999-10-26</span>
+<div class="popup-song">
+🎵 Sour Girl
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/1c/bd/431cbd59-b5c8-b1cd-ceb7-b6a98cfee2e4/mzaf_5802779291305731458.plus.aac.p.m4a" data-title="Shangri‐La Dee Da" data-song="Days of the Week" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/057ec65b-b0db-4a09-b662-3d5299da610c/45652314962-250.jpg">
 <img src="https://coverartarchive.org/release/057ec65b-b0db-4a09-b662-3d5299da610c/45652314962-250.jpg" alt="Shangri‐La Dee Da vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/f850cab8-9cf6-3cd8-8963-4c1b34735452/front-250" alt="Shangri‐La Dee Da" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Days of the Week">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Shangri‐La Dee Da
@@ -529,10 +636,16 @@ Stone Temple Pilots
 <span class="popup-date">★ 3.55 / 5</span>
 </div>
 <span class="popup-date">Released: 2001-06-19</span>
+<div class="popup-song">
+🎵 Days of the Week
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4c/55/0d/4c550d20-2db4-3e22-be06-06d6fb39319a/mzaf_17844361636320651281.plus.aac.p.m4a" data-title="Stone Temple Pilots" data-song="Between the Lines" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/7febf156-0d4f-4efa-9f14-deb962832f4a/22198116627-250.jpg">
 <img src="https://coverartarchive.org/release/7febf156-0d4f-4efa-9f14-deb962832f4a/22198116627-250.jpg" alt="Stone Temple Pilots vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/3f6341ad-ba15-4d42-9478-dc57af677a42/front-250" alt="Stone Temple Pilots" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Between the Lines">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Stone Temple Pilots
@@ -544,10 +657,16 @@ Stone Temple Pilots
 <span class="popup-date">★ 4.3 / 5</span>
 </div>
 <span class="popup-date">Released: 2010-05-20</span>
+<div class="popup-song">
+🎵 Between the Lines
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/91/fa/31/91fa31da-4fe3-0239-80d7-a881eb8f32b3/mzaf_3137873521320003027.plus.aac.p.m4a" data-title="Stone Temple Pilots" data-song="Meadow" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/176c7371-405b-44ab-87fb-f8bf872357dc/20060795067-250.jpg">
 <img src="https://coverartarchive.org/release/176c7371-405b-44ab-87fb-f8bf872357dc/20060795067-250.jpg" alt="Stone Temple Pilots vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/09b803e1-e200-47f6-a6c3-189368ec1e36/front-250" alt="Stone Temple Pilots" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Meadow">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Stone Temple Pilots
@@ -559,10 +678,16 @@ Stone Temple Pilots
 <span class="popup-date">★ 4 / 5</span>
 </div>
 <span class="popup-date">Released: 2018-03-16</span>
+<div class="popup-song">
+🎵 Meadow
 </div>
 </div>
-<div class="album-card">
+</div>
+<div class="album-card" data-audio="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/6f/93/3a6f93d7-83dd-86e2-d021-0444bfa7672b/mzaf_7296820993657418935.plus.aac.p.m4a" data-title="Perdida" data-song="Fare Thee Well" data-artist="Stone Temple Pilots" data-vinyl="https://coverartarchive.org/release/6caec415-8b74-4ad8-a2b6-86fe1d0d743d/25600996059-250.jpg">
 <img src="https://coverartarchive.org/release/6caec415-8b74-4ad8-a2b6-86fe1d0d743d/25600996059-250.jpg" alt="Perdida vinyl" class="vinyl-disc" loading="lazy"><img src="https://coverartarchive.org/release-group/52c4607d-47da-401e-888a-a65cdd572ad1/front-250" alt="Perdida" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/250x250/222/fff?text=Cover+Unavailable';">
+<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play Fare Thee Well">
+▶
+</div>
 <div class="album-popup">
 <div class="popup-title">
 Perdida
@@ -574,6 +699,9 @@ Stone Temple Pilots
 <span class="popup-date">★ 4 / 5</span>
 </div>
 <span class="popup-date">Released: 2020-02-07</span>
+<div class="popup-song">
+🎵 Fare Thee Well
+</div>
 </div>
 </div>
 </div>
@@ -582,6 +710,88 @@ Stone Temple Pilots
 </section>
 
 </main> <!-- /main -->
+<div id="audio-player-bar">
+  <img id="audio-bar-disc" class="mini-disc" src="" alt="spinning disc">
+  <span id="audio-bar-text">Playing...</span>
+  <button class="stop-btn" onclick="stopAudio()" title="Stop music">✕</button>
+</div>
+
+<script>
+let currentAudio = null;
+let currentCard = null;
+
+function handleCardPlay(e, overlayBtn) {
+  e.stopPropagation();
+  const card = overlayBtn.closest('.album-card');
+  const audioUrl = card.getAttribute('data-audio');
+  const song = card.getAttribute('data-song');
+  const artist = card.getAttribute('data-artist');
+  const title = card.getAttribute('data-title');
+  const vinylImg = card.getAttribute('data-vinyl');
+
+  const bar = document.getElementById('audio-player-bar');
+  const barText = document.getElementById('audio-bar-text');
+  const barDisc = document.getElementById('audio-bar-disc');
+
+  // If already playing this track: pause it
+  if (currentCard === card && currentAudio && !currentAudio.paused) {
+    currentAudio.pause();
+    card.classList.remove('is-playing');
+    overlayBtn.innerHTML = '▶';
+    if (bar) bar.classList.remove('active');
+    return;
+  }
+
+  // Stop previous track if any
+  if (currentAudio) {
+    currentAudio.pause();
+    if (currentCard) {
+      currentCard.classList.remove('is-playing');
+      const prevBtn = currentCard.querySelector('.album-play-overlay');
+      if (prevBtn) prevBtn.innerHTML = '▶';
+    }
+  }
+
+  // Play new track
+  currentAudio = new Audio(audioUrl);
+  currentCard = card;
+  card.classList.add('is-playing');
+  overlayBtn.innerHTML = '⏸';
+
+  if (bar && barText) {
+    barText.innerHTML = '<b>' + song + '</b> &bull; ' + artist + ' (<em>' + title + '</em>)';
+    if (barDisc) barDisc.src = vinylImg;
+    bar.classList.add('active');
+  }
+
+  currentAudio.play().catch(function(err) {
+    console.error("Audio playback error:", err);
+  });
+
+  currentAudio.onended = function() {
+    card.classList.remove('is-playing');
+    overlayBtn.innerHTML = '▶';
+    if (bar) bar.classList.remove('active');
+    currentAudio = null;
+    currentCard = null;
+  };
+}
+
+function stopAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  if (currentCard) {
+    currentCard.classList.remove('is-playing');
+    const prevBtn = currentCard.querySelector('.album-play-overlay');
+    if (prevBtn) prevBtn.innerHTML = '▶';
+    currentCard = null;
+  }
+  const bar = document.getElementById('audio-player-bar');
+  if (bar) bar.classList.remove('active');
+}
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

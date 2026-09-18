@@ -83,14 +83,16 @@ Hover your cursor over any vinyl cover to view album information.
 #| results: asis
 
 cards <- glue::glue(
-  '<div class="album-card">',
+  '<div class="album-card" data-audio="{albums$audio_url}" data-title="{albums$title}" data-song="{albums$best_song}" data-artist="{albums$artist}" data-vinyl="{albums$vinyl_url}">',
   '<img src="{albums$vinyl_url}" alt="{albums$title} vinyl" class="vinyl-disc" loading="lazy" />',
   '<img src="{albums$cover_url}" alt="{albums$title}" class="album-cover" loading="lazy" onerror="this.onerror=null;this.src=\'https://placehold.co/250x250/222/fff?text=Cover+Unavailable\';" />',
+  '<div class="album-play-overlay" onclick="handleCardPlay(event, this)" title="Play {albums$best_song}">▶</div>',
   '<div class="album-popup">',
   '<div class="popup-title">{albums$title}</div>',
   '<div class="popup-artist">{albums$artist}</div>',
   '<div style="margin-bottom: 5px;"><span class="popup-date">★ {albums$rating} / 5</span></div>',
   '<span class="popup-date">Released: {albums$release_date}</span>',
+  '<div class="popup-song">🎵 {albums$best_song}</div>',
   '</div>',
   '</div>'
 )
