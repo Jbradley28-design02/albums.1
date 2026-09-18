@@ -26,7 +26,7 @@ fetch_albums <- function(artist_id, artist_name) {
   url <- paste0(
     "https://musicbrainz.org/ws/2/release-group?artist=",
     artist_id,
-    "&limit=100&fmt=json"
+    "&inc=ratings&limit=100&fmt=json"
   )
   
   res <- request(url) |>
@@ -48,11 +48,13 @@ fetch_albums <- function(artist_id, artist_name) {
     title = map_chr(rgs, "title"),
     primary_type = map_chr(rgs, \(x) x[["primary-type"]] %||% NA_character_),
     secondary_types = map_chr(rgs, \(x) paste(x[["secondary-types"]], collapse = ", ")),
-    release_date = map_chr(rgs, \(x) x[["first-release-date"]] %||% NA_character_)
+    release_date = map_chr(rgs, \(x) x[["first-release-date"]] %||% NA_character_),
+    rating = map_dbl(rgs, \(x) as.numeric(x[["rating"]][["value"]] %||% NA_real_)),
+    votes = map_int(rgs, \(x) as.integer(x[["rating"]][["votes-count"]] %||% 0L))
   ) |>
     filter(primary_type == "Album", secondary_types == "") |>
     mutate(cover_url = paste0("https://coverartarchive.org/release-group/", id, "/front-250")) |>
-    select(artist, title, release_date, cover_url)
+    select(artist, title, release_date, rating, votes, cover_url)
 }
 
 if (file.exists("albums.csv") && nrow(read_csv("albums.csv", show_col_types = FALSE)) > 0) {

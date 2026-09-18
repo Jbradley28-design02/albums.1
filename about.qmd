@@ -2,4 +2,14 @@
 title: "About"
 ---
 
-About this site
+This project explores and compares the studio album discographies of **Pink Floyd** and **Stone Temple Pilots**. 
+
+### Purpose & Methodology
+By analyzing release dates from 1967 to 2020, this site investigates how the eras of a classic British progressive rock giant and an American 1990s alternative rock icon intersect. Albums released closest in time represent their most similar chronological era, while those furthest apart highlight their generational span.
+
+### Data Sources
+- **Discography Data:** [MusicBrainz API](https://musicbrainz.org/) for release dates, metadata, and album ratings.
+- **Album Artwork:** [Cover Art Archive](https://coverartarchive.org/).
+
+### Source Code
+The code and analysis were built with R, Quarto, and the tidyverse. You can explore the repository on [GitHub](https://github.com/Jbradley28-design02/albums.1).
